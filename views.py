@@ -1,38 +1,40 @@
-
-
-from django.shortcuts import render, redirect, get_object_or_404
-from .models import Resource, BenchType
-from .forms import ResourceForm, BenchTypeForm
+from django.shortcuts import render, redirect
+from .models import BenchType
+from ..Application.forms import companies
 
 def benchtype_list(request):
     types = BenchType.objects.all()
-    return render(request, 'companies/benchtype_list.html', {'types': types})
+    return render(request, 'admin/benchtype_list.html', {'types': types})
 
-def resource_list(request, type_id):
-    resources = Resource.objects.filter(type_id=type_id, status='Available')
-    return render(request, 'companies/resource_list.html', {'resources': resources})
-
-def book_resource(request, resource_id):
-    resource = get_object_or_404(Resource, id=resource_id)
+def benchtype_add(request):
     if request.method == 'POST':
-        resource.status = 'Booked'
-        resource.booked_by = request.user
-        resource.booked_date = datetime.date.today()
-        resource.save()
-        return redirect('my_bookings')
-    return render(request, 'companies/book_resource.html', {'resource': resource})
+        form = companies(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('benchtype_list')
+    else:
+        form = companies()
+    return render(request, 'admin/benchtype_form.html', {'form': form})
 
-def my_bookings(request):
-    bookings = Resource.objects.filter(booked_by=request.user)
-    return render(request, 'companies/my_bookings.html', {'bookings': bookings})
-
-def release_resource(request, resource_id):
-    resource = get_object_or_404(Resource, id=resource_id)
+def benchtype_edit(request, pk):
+    type = BenchType.objects.get(pk=pk)
     if request.method == 'POST':
-        resource.status = 'Available'
-        resource.booked_by = None
-        resource.booked_date = None
-        resource.save()
-        return redirect('my_bookings')
-    return render(request, 'companies/release_resource.html', {'resource': resource})
+        form = companies(request.POST, instance=type)
+        if form.is_valid():
+            form.save()
+            return redirect('benchtype_list')
+    else:
+        form = companies(instance=type)
+    return render(request, 'admin/benchtype_form.html', {'form': form})
+
+def benchtype_delete(request, pk):
+    type = BenchType.objects.get(pk=pk)
+    type.delete()
+    return redirect('benchtype_list')
+  
+def resource_list(request, bench_type_id):
+    resources = Resource.objects.filter(bench_type_id=bench_type_id, booked_by__isnull=True)
+    return render(request, 'company/resource_list.html', {'resources': resources})
+
+
 
