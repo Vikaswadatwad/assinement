@@ -1,0 +1,6 @@
+<h1>Resources</h1>
+<ul>
+    {% for resource in resources %}
+        <li>{{ resource.name }} - <a href="{% url 'book_resource' resource.id %}">Book for Me</a></li>
+    {% endfor %}
+</ul>

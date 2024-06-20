@@ -1,0 +1,6 @@
+<h1>My Bookings</h1>
+<ul>
+    {% for booking in bookings %}
+        <li>{{ booking.name }} - <a href="{% url 'release_resource' booking.id %}">Release Resource</a></li>
+    {% endfor %}
+</ul>

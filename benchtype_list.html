@@ -1,0 +1,6 @@
+<h1>Bench Types</h1>
+<ul>
+    {% for type in types %}
+        <li><a href="{% url 'resource_list' type.id %}">{{ type.name }}</a></li>
+    {% endfor %}
+</ul>
